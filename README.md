@@ -1,13 +1,20 @@
 
 # ESP32 Web-Controlled GPIO Interface
 
-This project demonstrates how to use an ESP32 board as a simple web server to control GPIO pins through HTTP requests. It sets up a WiFi connection, hosts a web page, and exposes an HTTP interface to change the status of specific digital pins.
+This project demonstrates how to use an ESP32 board as a simple web server to control GPIO pins through HTTP requests. It can be sets up in two different modalities:
+
+1. As a Access Point to permit clients to connect via WiFi (currently disabled)
+2. As a WiFi client, connected to an existing network
+
+It exposes an HTTP interface (described below) to change the status of specific digital pins.
+
+NOTE! ESP32 works with 2,4GHz band only.
 
 ## Features
 
 - Hosts a simple HTML web page at the root (`/`) with example content.
 - Provides an HTTP endpoint (`/pin`) to control GPIO pin states via query parameters.
-- Supports both WiFi Station and Access Point modes (Access Point disabled by default).
+- Supports both WiFi Station and Access Point modes.
 - Includes error handling for invalid or missing parameters.
 - CORS headers enabled for the `/pin` endpoint.
 
@@ -24,12 +31,17 @@ This project demonstrates how to use an ESP32 board as a simple web server to co
 3. **Install the required libraries** (typically included with ESP32 core):
    - `WiFi.h`
    - `WebServer.h`
-4. **Update WiFi credentials** in `setupWiFiStation()`:
-   ```cpp
-   const char* ssid = "change-me";
-   const char* password = "change-me";
-   ```
-5. **Upload the sketch** to your ESP32.
+4. Depending on your preferred usage:
+   - **Update WiFi credentials** in `setupWiFiStation()`:
+      ```cpp
+      const char* ssid = "change-me";
+      const char* password = "change-me";
+      ```
+   - **Update WiFi credentials** in `setupAccessPoint()`:
+     ```cpp
+      WiFi.softAP("ESP32-AP", "asdrubale123")
+      ```
+6. **Upload the sketch** to your ESP32.
 
 ## Usage
 
