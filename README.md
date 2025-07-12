@@ -1,56 +1,70 @@
-# ESP32 Access Point Web Server
 
-This project sets up an ESP32 as a Wi-Fi Access Point and runs a lightweight web server.  
-When a user connects to the ESP32's Wi-Fi network and opens a browser, they can access a simple HTML page served directly by the ESP32 via http://192.168.4.1/
+# ESP32 Web-Controlled GPIO Interface
 
-## 📡 Features
+This project demonstrates how to use an ESP32 board as a simple web server to control GPIO pins through HTTP requests. It sets up a WiFi connection, hosts a web page, and exposes an HTTP interface to change the status of specific digital pins.
 
-- ESP32 creates its own Wi-Fi Access Point (`ESP32-AP`)
-- Serves an HTML page at `/` with styled text
-- Handles unknown routes with a custom 404 error page
-- Uses modern `enum class` to define HTTP status codes
-- Clean and modular code, easy to expand
+## Features
 
-## 🛠️ Requirements
+- Hosts a simple HTML web page at the root (`/`) with example content.
+- Provides an HTTP endpoint (`/pin`) to control GPIO pin states via query parameters.
+- Supports both WiFi Station and Access Point modes (Access Point disabled by default).
+- Includes error handling for invalid or missing parameters.
+- CORS headers enabled for the `/pin` endpoint.
 
-- ESP32 board (e.g., ESP32 DevKit, ESP32-S3 WROOM)
-- Arduino IDE or PlatformIO
-- Libraries:
-  - [`WiFi.h`](https://www.arduino.cc/en/Reference/WiFi)
-  - [`WebServer.h`](https://github.com/espressif/arduino-esp32/tree/master/libraries/WebServer)
+## Requirements
 
-## 🚀 How It Works
+- ESP32 board
+- Arduino IDE with ESP32 board support installed
+- WiFi credentials (SSID and password)
 
-1. The ESP32 boots and creates a Wi-Fi access point:
+## Installation
+
+1. **Clone or copy the code** to your local machine.
+2. **Open the sketch** in the Arduino IDE.
+3. **Install the required libraries** (typically included with ESP32 core):
+   - `WiFi.h`
+   - `WebServer.h`
+4. **Update WiFi credentials** in `setupWiFiStation()`:
+   ```cpp
+   const char* ssid = "change-me";
+   const char* password = "change-me";
    ```
-   SSID: ESP32-AP
-   Password: asdrubale123
-   ```
-2. A user connects to this Wi-Fi network with a smartphone or laptop.
-3. The user navigates to `http://192.168.4.1/` in a browser.
-4. The ESP32 serves a simple, styled HTML page.
-5. If the user tries an unknown route, they are redirected to a custom 404 page with a link to go back to `/`.
+5. **Upload the sketch** to your ESP32.
 
-## 🧠 Code Structure
+## Usage
 
-- **`setupAccessPoint()`** – Creates the ESP32 AP and prints the IP address.
-- **`setupHttpServer()`** – Defines routes and starts the web server.
-- **`enum class HttpStatus`** – Enumerates HTTP status codes.
-- **`rootHtmlContent`** – Main HTML page shown at `/`.
-- **`rootNotFound`** – 404 error page shown when a path doesn't exist.
+### Web Page
 
-## 🔧 Customization
+Once the ESP32 connects to your network, open a browser and go to the IP address shown in the Serial Monitor. You'll see a simple HTML page at the root path `/`.
 
-You can easily add more routes like this:
+### Control GPIO Pins
 
-```cpp
-server.on("/status", []() {
-  server.send(static_cast<int>(HttpStatus::OK), contentType, "<p>ESP32 is running.</p>");
-});
+You can control pins via the `/pin` endpoint.  
+**Allowed pins:** `2, 4, 5, 12, 13, 14, 15, 16, 17`  
+**Allowed statuses:** `ON`, `OFF`
+
+#### Example URL:
+```
+http://<ESP32_IP>/pin?number=13&status=ON
 ```
 
-## 📄 License
+This sets pin 13 to `HIGH`.
 
-This project is open-source under the MIT License.  
-Feel free to use, modify, and build upon it.
+### Response
 
+The ESP32 responds with an HTML confirmation showing the pin number and the new status.
+
+## Error Handling
+
+- Missing parameters → 400 Bad Request
+- Invalid pins → 404 Not Found
+- Unknown routes → 404 page with redirect to `/`
+
+## Customization
+
+- You can easily modify the HTML content in the `rootHtmlContent` variable.
+- To enable Access Point mode, uncomment the `setupAccessPoint()` call in `setup()` and comment out the WiFi Station mode.
+
+## License
+
+This project is open-source and free to use for educational and personal purposes.
